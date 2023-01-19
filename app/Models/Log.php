@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Log extends Model
 {
     use HasFactory;
+    use WithQueryFilter;
 
     protected $fillable = [
         'service_name',
