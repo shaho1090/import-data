@@ -17,14 +17,17 @@ class CreateLargeLogTextFile extends Seeder
      */
     public function run()
     {
+//        ini_set('memory_limit', '13g');
+
         $this->date = Carbon::now()->subMonths(10);
 
-        $this->getRandomLineData();
+        $array = [];
 
         for ($i = 1; $i <= 1000; $i++) {
-            Storage::append('/logFiles/log-file-3.txt', $this->getRandomLineData());
+            $array[] =  $this->getRandomLineData();
         }
 
+        Storage::append('/logFiles/log-file-12.txt', implode("\n", $array));
     }
 
     private function getRandomLineData(): string
@@ -44,12 +47,11 @@ class CreateLargeLogTextFile extends Seeder
             ]
         ]);
 
-        $date = $this->date->addSeconds(5)->format("d/M/Y H:i:s");
+        $date = $this->date->addSeconds(5)->format("d/M/Y:H:i:s");
         $service = $services->random();
 
         return
             $service['service-name'] . ' ' . "-" . ' [' . $date . '] ' . '"' . 'POST ' . $service['path']
             . ' HTTP/1.1' . '" ' . $status->random();
     }
-
 }
