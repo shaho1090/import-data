@@ -33,7 +33,7 @@ class ImportDataFromTextCommand extends Command
 
         if(!Storage::fileExists('/logFiles/'.$fileName)){
             $this->error('There is no such file in the logFiles directory!');
-        };
+        }
 
         $path = Storage::path('/logFiles/'.$fileName);
 
