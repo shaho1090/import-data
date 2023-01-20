@@ -17,7 +17,8 @@ class CreateLargeLogTextFile extends Seeder
      */
     public function run()
     {
-//        ini_set('memory_limit', '13g');
+        /** In case you encounter memory limitation  **/
+        // ini_set('memory_limit', '13g');
 
         $this->date = Carbon::now()->subMonths(10);
 
