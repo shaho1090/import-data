@@ -62,3 +62,5 @@ Then, run the following commands:
 - php artisan serve
 ```
 That's it!
+
+Notice: normally the port for using the app is 8000, it will be shown after running last command. 
