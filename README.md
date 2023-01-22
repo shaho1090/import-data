@@ -58,6 +58,7 @@ Then, run the following commands:
 ```
 - composer install
 - php artisan key:generate
+- php artisan migrate
 - php artisan serve
 ```
 That's it!
