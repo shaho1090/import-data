@@ -1,66 +1,63 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Introduction
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Assume you have a huge file to import into a database, like a text log file with more than 10 million lines. I have experimented with many ways to handle this issue during the creation of this app.
+I had a simple text file with its specific structure to import. So, I needed to parse this file line by line. I created a command to get and parse the file:   
+```
+php artisan import:from-text "filename.txt"
+```   
+By running this command, our story gets to start. Just make sure that the file is in this directory:    
+````
+"storage/app/logFiles"
+````   
+This command will fetch the full path of the file and will pass it to a job. In the earlier version of the app, I did the entire implementation inside this job, but later I made separate classes to decouple the implementations and logic. I tried to utilize single responsibility.  
+The queue worker should be run before or after this command:   
+````
+php artisan queue:listen --queue="import-text-log-file"
+````
+You may complain that the better way to run queue workers is "queue:work", but trust me, I test it many times with spending a lot of time. If you run the queue workers with this command, you will encounter the memory limitation error.  
+As **Mohamed Said**  mentioned in this [link ](https://divinglaravel.com/avoiding-memory-leaks-when-running-laravel-queue-workers), if you want to prevent memory leaking while running the queue workers you should restart them before that happen. He suggest some ways for do that.   
+But in our case the better way is using **queue:listen** instead and you will never face any issue. This command just run the jobs a little bit slower.   
+The job is responsible for importing lines to database, each time import ten lines of the file. Why 10 lines? because I tested this also and if you set the lines in bigger number, like to 20 lines, the time of inserting the lines into database is steadily increased.
+After that the call itself to read and parse next ten lines until the last line of file.   
+We also have a endpoint to filter and count the imported data:     
+````
+localhost:8000/api/logs/count
+````
+The example of usage:   
+- Filter by service name,
+````
+localhost:8000/api/logs/count?serviceName=invoice-service
+````
 
-## About Laravel
+- Filter by status code:   
+````
+localhost:8000/api/logs/count?statusCode=201
+````
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Filter by start date and end date:   
+````
+localhost:8000/api/logs/count?startDate=2022-03-17&endDate=2022-03-20
+````
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- You can combine filter together:   
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+````
+localhost:8000/api/logs/count?serviceName=invoice-service&startDate=2022-03-17&endDate=2022-03-20
+````
 
-## Learning Laravel
+You may want to make your own file with specific number of lines to test:     
+```
+php artisan create:log-file <filename> <numberOfLines>
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+php artisan create:log-file "testFile" 100000
+```
+## Installation
+I used php version 8.2 and mysql version 8.
+Just create your own database, clone the repository, open the project directory make your own **.env** file and set the keys inside it.   
+Then, run the following commands:
+```
+- composer install
+- php artisan key:generate
+- php artisan serve
+```
+That's it!
