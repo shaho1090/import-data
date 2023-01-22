@@ -10,7 +10,7 @@ By running this command, our story gets to start. Just make sure that the file i
 "storage/app/logFiles"
 ````   
 This command will fetch the full path of the file and will pass it to a job. In the earlier version of the app, I did the entire implementation inside this job, but later I made separate classes to decouple the implementations and logic. I tried to utilize single responsibility.  
-The queue worker should be run before or after this command:   
+The queue worker should be run before or after previous command:   
 ````
 php artisan queue:listen --queue="import-text-log-file"
 ````
