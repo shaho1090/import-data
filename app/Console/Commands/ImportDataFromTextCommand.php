@@ -3,9 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Jobs\ImportDataFromTextFileJob;
-use App\Jobs\RunImportDataQueueWorkerJob;
+use App\Jobs\ImportTextLogFileJob;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 
 class ImportDataFromTextCommand extends Command
@@ -35,11 +34,12 @@ class ImportDataFromTextCommand extends Command
 
         if (!Storage::fileExists('/logFiles/' . $fileName)) {
             $this->error('There is no such file in the logFiles directory!');
+            return Command::INVALID;
         }
 
         $path = Storage::path('/logFiles/' . $fileName);
 
-        ImportDataFromTextFileJob::dispatch($path);
+        ImportTextLogFileJob::dispatch($path);
 
         $this->info('The file has been passed to the job to import ');
 
