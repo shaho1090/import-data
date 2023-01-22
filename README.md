@@ -17,7 +17,7 @@ php artisan queue:listen --queue="import-text-log-file"
 You may complain that the better way to run queue workers is "queue:work", but trust me, I test it many times with spending a lot of time. If you run the queue workers with this command, you will encounter the memory limitation error.  
 As **Mohamed Said**  mentioned in this [link ](https://divinglaravel.com/avoiding-memory-leaks-when-running-laravel-queue-workers), if you want to prevent memory leaking while running the queue workers you should restart them before that happen. He suggest some ways to do that.   
 But in our case the better way is using **queue:listen** instead and you will never face any issue. This command just run the jobs a little bit slower.   
-The job is responsible for sending three parameters to a class that parse and insert the lines. The parameters are **file path**, **startLine** ,and **endLine**. The **TextLogFileParserService** import ten lines of the file in each time. Why 10 lines? because I tested this also and if you set the lines in bigger number, like to 20 lines, the time of inserting the lines into database is steadily increased.
+The job is responsible for sending three parameters to a class that parse and insert the lines. The parameters are **file path**, **startLine** ,and **endLine**. The **TextLogFileParserService** import ten lines of the file in each time. Why 10 lines? because I tested this also and if you set the lines in bigger number, such as 20 lines, the time of inserting the lines into database is steadily increased.
 After a while queue workers will work very slowly.
 Then, the job call itself to read and parse next ten lines until the last line of file.   
 We also have a endpoint to filter and count the imported data:     
