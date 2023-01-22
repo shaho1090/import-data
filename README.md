@@ -18,8 +18,8 @@ You may complain that the better way to run queue workers is "queue:work", but t
 As **Mohamed Said**  mentioned in this [link ](https://divinglaravel.com/avoiding-memory-leaks-when-running-laravel-queue-workers), if you want to prevent memory leaking while running the queue workers you should restart them before that happen. He suggest some ways to do that.   
 But in our case the better way is using **queue:listen** instead and you will never face any issue. This command just run the jobs a little bit slower.   
 The job is responsible for sending three parameters to a class that parse and insert the lines. The parameters are **file path**, **startLine** ,and **endLine**. The **TextLogFileParserService** import ten lines of the file in each time. Why 10 lines? because I tested this also and if you set the lines in bigger number, such as 20 lines, the time of inserting the lines into database is steadily increased.
-After a while queue workers will work very slowly.
-Then, the job call itself to read and parse next ten lines until the last line of file.   
+After a while queue workers will work very slowly.   
+After passing those three parameters to the parser class,if there are lines remained to parse and import, the job call itself to do the process for the next ten lines until the last line of file.   
 We also have a endpoint to filter and count the imported data:     
 ````
 localhost:8000/api/logs/count
