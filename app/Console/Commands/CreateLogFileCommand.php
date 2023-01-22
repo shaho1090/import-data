@@ -1,34 +1,51 @@
 <?php
 
-namespace Database\Seeders;
+namespace App\Console\Commands;
 
 use Carbon\Carbon;
-use Illuminate\Database\Seeder;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
-class CreateLargeLogTextFile extends Seeder
+class CreateLogFileCommand extends Command
 {
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'create:log-file {fileName} {numberOfLines}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Create a text log file for testing.';
     private Carbon $date;
 
     /**
-     * Seed the application's database.
+     * Execute the console command.
      *
-     * @return void
+     * @return int
      */
-    public function run()
+    public function handle()
     {
-        /** In case you encounter memory limitation  **/
+        /** In case you may encounter memory limitation for a very large file **/
         // ini_set('memory_limit', '13g');
 
         $this->date = Carbon::now()->subMonths(10);
 
         $array = [];
 
-        for ($i = 1; $i <= 1000; $i++) {
+        for ($i = 1; $i <= $this->argument('numberOfLines'); $i++) {
             $array[] =  $this->getRandomLineData();
         }
 
-        Storage::append('/logFiles/log-file-12.txt', implode("\n", $array));
+        Storage::append('/logFiles/'.$this->argument('fileName').'.txt', implode("\n", $array));
+
+        $this->info('The file was created in this path:/storage/app/logFiles');
+
+        return Command::SUCCESS;
     }
 
     private function getRandomLineData(): string
