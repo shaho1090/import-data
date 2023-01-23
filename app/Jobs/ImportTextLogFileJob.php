@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Services\Concretes\LogService;
 use App\Services\FileService\TextLogFileParserService;
-use App\Services\LogService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
