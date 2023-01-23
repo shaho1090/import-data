@@ -42,7 +42,7 @@ localhost:8000/api/logs/count?statusCode=201
 localhost:8000/api/logs/count?startDate=2022-03-17&endDate=2022-03-20
 ````
 
-- You can combine filter together:   
+- Also, you can combine filters together:   
 
 ````
 localhost:8000/api/logs/count?serviceName=invoice-service&startDate=2022-03-17&endDate=2022-03-20
