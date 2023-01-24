@@ -56,7 +56,10 @@ php artisan create:log-file "testFile" 100000
 ```
 ## Installation
 I used php version 8.2 and mysql version 8.
-Just create your own database, clone the repository, open the project directory make your own **.env** file and set the keys inside it.   
+Just create your own database, clone the repository, open the project directory make your own **.env** file and set the keys inside it. Do not forget to set the queue connection key:   
+```
+QUEUE_CONNECTION=database
+```
 Then, run the following commands:
 ```
 - composer install
